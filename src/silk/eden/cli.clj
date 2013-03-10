@@ -1,5 +1,5 @@
 (ns silk.eden.cli
-  (:require [clojure.java.io :refer [file]]
+  (:require [clojure.java.io :refer [delete-file file]]
             [me.raynes.laser :as l]
             [silk.input.env :as se]
             [silk.input.file :as sf])
@@ -12,6 +12,10 @@
 ;; =============================================================================
 
 (def c-state (atom nil))
+
+(defn- delete-directory
+  [d]
+  (doseq [f (reverse (file-seq (File. d)))] (delete-file f)))
 
 (defn- get-views [] (rest (file-seq (file se/views-path))))
 
@@ -59,6 +63,7 @@
   (let [views (get-views)
         templated-views (map #(view-inject %) views)
         pages (map #(process-components %) templated-views)]
+    (when (.exists (File. "site")) (delete-directory "site"))
     (.mkdir (new File "site"))
     (doseq [t pages]
       (spit (str se/site-path (:file t)) (:content t)))))
