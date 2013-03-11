@@ -1,5 +1,5 @@
 (ns silk.eden.cli
-  (:require [clojure.java.io :refer [delete-file file]]
+  (:require [clojure.java.io :refer [copy delete-file file]]
             [me.raynes.laser :as l]
             [silk.input.env :as se]
             [silk.input.file :as sf])
@@ -16,6 +16,13 @@
 (defn- delete-directory
   [d]
   (doseq [f (reverse (file-seq (File. d)))] (delete-file f)))
+
+(defn- copy-recursive
+  [src dest]
+  (doseq [f (remove #(.isDirectory %) (file-seq (file src)))]
+    (let [dest-file (file dest f)]
+      (.mkdirs (.getParentFile dest-file))
+      (copy f dest-file))))
 
 (defn- get-views [] (rest (file-seq (file se/views-path))))
 
@@ -65,5 +72,7 @@
         pages (map #(process-components %) templated-views)]
     (when (.exists (File. "site")) (delete-directory "site"))
     (.mkdir (new File "site"))
+    (copy-recursive "resource" "site")
+    (copy-recursive "meta" "site")
     (doseq [t pages]
       (spit (str se/site-path (:file t)) (:content t)))))
