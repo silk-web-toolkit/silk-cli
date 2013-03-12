@@ -35,10 +35,15 @@
 
 (defn- view-inject
   [v]
-  (let [parsed-view (l/parse v)]
+  (let [parsed-view (l/parse v)
+        meta-template (l/select parsed-view 
+                       (l/and (l/element= :meta) (l/attr= :name "template")))
+        template (if-not (nil? (first meta-template)) 
+                   (sf/template (str (:content (:attrs (first meta-template))) ".html"))
+                   (sf/template "default.html"))]
     {:file (.getName v)
      :content (l/document
-                (l/parse (sf/template "default.html"))
+                (l/parse template)
                 (l/id="silk-view")
                   (l/replace
                     (l/select parsed-view
