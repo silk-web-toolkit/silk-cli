@@ -1,6 +1,7 @@
 (ns silk.eden.cli
   (:require [clojure.java.io :refer [copy delete-file file]]
             [me.raynes.laser :as l]
+            [pathetic.core :as path]
             [silk.input.env :as se]
             [silk.input.file :as sf])
   (:use [clojure.string :only [split]])
@@ -24,7 +25,7 @@
       (.mkdirs (.getParentFile dest-file))
       (copy f dest-file))))
 
-(defn- get-views [] (rest (file-seq (file se/views-path))))
+(defn- get-views [] (remove #(.isDirectory %) (file-seq (file se/views-path))))
 
 (defn- build-component
   [i]
@@ -41,7 +42,7 @@
         template (if-not (nil? (first meta-template)) 
                    (sf/template (str (:content (:attrs (first meta-template))) ".html"))
                    (sf/template "default.html"))]
-    {:file (.getName v)
+    {:file (path/relativize se/views-path (.getPath v))
      :content (l/document
                 (l/parse template)
                 (l/id="silk-view")
@@ -66,6 +67,29 @@
       (component-inject id))
     (assoc t :content @c-state)))
 
+(defn- relativise-attr
+  [v p]
+  (let [vp (.getParent (File. p))]
+    (if-not (nil? vp)
+      (let [pv (path/parse-path v)
+            parsed-uri (some #{"http:" "https:" "mailto:"} pv)]
+        (if-not (nil? parsed-uri)
+          v
+          (let [rel (path/relativize 
+                      (.getParent (File. se/views-path p))
+                      se/views-path)]
+            (str rel "/" v))))
+      v)))
+
+(defn- attrib-rewrite
+  [e a p]
+  (let [page (l/parse (:content p))
+        uri-tx (l/document
+                 page 
+                 (l/and (l/element= e) (l/attr? a))
+                   (l/update-attr a relativise-attr (:file p)))]
+    (assoc p :content uri-tx)))
+
 
 ;; =============================================================================
 ;; Application entry point
@@ -74,10 +98,14 @@
 (defn -main [& args]
   (let [views (get-views)
         templated-views (map #(view-inject %) views)
-        pages (map #(process-components %) templated-views)]
+        pages (map #(process-components %) templated-views)
+        href-rewritten (map #(attrib-rewrite :link :href %) pages)
+        src-rewritten (map #(attrib-rewrite :img :src %) href-rewritten)]
     (when (.exists (File. "site")) (delete-directory "site"))
     (.mkdir (new File "site"))
     (copy-recursive "resource" "site")
     (copy-recursive "meta" "site")
-    (doseq [t pages]
-      (spit (str se/site-path (:file t)) (:content t)))))
+    (doseq [t src-rewritten]
+      (let [parent (.getParent (new File (:file t)))]
+        (when-not (nil? parent) (.mkdirs (File. "site" parent)))
+        (spit (str se/site-path (:file t)) (:content t))))))
