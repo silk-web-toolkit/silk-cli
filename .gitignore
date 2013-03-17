@@ -1,4 +1,5 @@
 .lein-repl-history
+/components
 /view
 /site
 /template
