@@ -117,8 +117,9 @@
   (let [views (get-views)
         templated-views (map #(view-inject %) views)
         pages (map #(process-components %) templated-views)
-        href-rewritten (map #(attrib-rewrite :link :href %) pages)
-        src-rewritten (map #(attrib-rewrite :img :src %) href-rewritten)]
+        link-rewritten (map #(attrib-rewrite :link :href %) pages)
+        img-rewritten (map #(attrib-rewrite :img :src %) link-rewritten)
+        script-rewritten (map #(attrib-rewrite :script :src %) img-rewritten)]
     (ascii-art)
     (println "")
     (println "v0.2.0-SNAPSHOT")
@@ -127,7 +128,7 @@
     (copy-recursive "resource" "site")
     (copy-recursive "meta" "site")
     (println "Spinning your site...")
-    (doseq [t src-rewritten]
+    (doseq [t script-rewritten]
       (let [parent (.getParent (new File (:file t)))]
         (when-not (nil? parent) (.mkdirs (File. "site" parent)))
         (spit (str se/site-path (:file t)) (:content t))))
