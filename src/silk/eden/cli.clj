@@ -12,6 +12,13 @@
 ;; Helper functions
 ;; =============================================================================
 
+(defn- ascii-art
+  []
+  (println "    _ _ _")
+  (println " __(_) | |__")
+  (println "(_-< | | / /")
+  (println "/__/_|_|_\\_\\\\"))
+
 (def c-state (atom nil))
 
 (defn- delete-directory
@@ -112,7 +119,9 @@
         pages (map #(process-components %) templated-views)
         href-rewritten (map #(attrib-rewrite :link :href %) pages)
         src-rewritten (map #(attrib-rewrite :img :src %) href-rewritten)]
-    (println "Silk v0.2.0-SNAPSHOT")
+    (ascii-art)
+    (println "")
+    (println "v0.2.0-SNAPSHOT")
     (when (.exists (File. "site")) (delete-directory "site"))
     (.mkdir (new File "site"))
     (copy-recursive "resource" "site")
