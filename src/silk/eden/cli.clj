@@ -122,7 +122,7 @@
         script-rewritten (map #(attrib-rewrite :script :src %) img-rewritten)]
     (ascii-art)
     (println "")
-    (println "v0.2.0-SNAPSHOT")
+    (println "v0.2.0-pre.1")
     (when (.exists (File. "site")) (delete-directory "site"))
     (.mkdir (new File "site"))
     (copy-recursive "resource" "site")
