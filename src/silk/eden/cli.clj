@@ -21,6 +21,8 @@
 
 (def c-state (atom nil))
 
+(def m-state (atom "test"))
+
 (defn- delete-directory
   [d]
   (doseq [f (reverse (file-seq (File. d)))] (delete-file f)))
@@ -97,7 +99,7 @@
                      (.getParent (File. se/views-path p))
                      se/views-path)]
             (str rel "/" v))))
-      v)))
+      (if (= @m-state "live") (str "/" v) v))))
 
 (defn- attrib-rewrite
   [e a p]
@@ -121,6 +123,7 @@
         img-rewritten (map #(attrib-rewrite :img :src %) link-rewritten)
         script-rewritten (map #(attrib-rewrite :script :src %) img-rewritten)
         a-rewritten (map #(attrib-rewrite :a :href %) script-rewritten)]
+    (if-not (nil? (first args)) (reset! m-state (first args)))
     (ascii-art)
     (println "")
     (println "v0.2.0-pre.1")

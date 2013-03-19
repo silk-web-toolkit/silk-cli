@@ -1,8 +1,3 @@
 #!/bin/bash
 
-SK=$HOME/.silk
-
-if [ "$1" == "spin" ]; then
-  java -jar $HOME/bin/silk.jar $1
-fi
-
+java -jar $HOME/bin/silk.jar $1
