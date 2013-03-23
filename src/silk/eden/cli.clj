@@ -4,7 +4,8 @@
             [pathetic.core :as path]
             [silk.input.env :as se]
             [silk.input.file :as sf])
-  (:use [clojure.string :only [split]])
+  (:use [clojure.string :only [split]]
+        [watchtower.core])
   (import java.io.File)
   (:gen-class))
 
@@ -17,7 +18,7 @@
   (println "    _ _ _")
   (println " __(_) | |__")
   (println "(_-< | | / /")
-  (println "/__/_|_|_\\_\\\\"))
+  (println "/__/_|_|_\\_\\"))
 
 (def c-state (atom nil))
 
@@ -110,12 +111,8 @@
                    (l/update-attr a relativise-attr (:file p)))]
     (assoc p :content uri-tx)))
 
-
-;; =============================================================================
-;; Application entry point
-;; =============================================================================
-
-(defn -main [& args]
+(defn- spin
+  [args]
   (let [views (get-views)
         templated-views (map #(view-inject %) views)
         pages (map #(process-components %) templated-views)
@@ -137,3 +134,26 @@
         (when-not (nil? parent) (.mkdirs (File. "site" parent)))
         (spit (str se/site-path (:file t)) (:content t))))
     (println "Site spinning is complete, we hope you like it.")))
+
+(defn- reload-report
+  [payload]
+  (println "files changed : " payload)
+  (spin ["spin"]))
+
+(defn- reload
+  []
+  (watcher ["view/" "template/" "resource/"]
+    (rate 500) ;; poll every 500ms
+    (file-filter ignore-dotfiles) ;; add a filter for the files we care about
+    (file-filter (extensions :html :css :js)) ;; filter by extensions
+    (on-change #(reload-report %))))
+
+
+;; =============================================================================
+;; Application entry point
+;; =============================================================================
+
+(defn -main [& args]
+  (if (= (first args) "reload")
+    (reload)
+    (spin args)))
