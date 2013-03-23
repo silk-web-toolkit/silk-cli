@@ -123,7 +123,7 @@
     (if-not (nil? (first args)) (reset! m-state (first args)))
     (ascii-art)
     (println "")
-    (println "v0.2.0-pre.1")
+    (println "v0.2.0-pre.2")
     (when (.exists (File. "site")) (delete-directory "site"))
     (.mkdir (new File "site"))
     (copy-recursive "resource" "site")
