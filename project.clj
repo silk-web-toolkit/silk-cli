@@ -1,4 +1,4 @@
-(defproject silk-eden "0.2.0-pre.1"
+(defproject silk-eden "0.2.0-pre.2"
   :description "Silk compile time, habitat for templates, components, inputs and transformations."
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.4.0"]
