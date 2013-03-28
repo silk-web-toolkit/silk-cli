@@ -142,7 +142,7 @@
 
 (defn- reload
   []
-  (watcher ["view/" "template/" "resource/"]
+  (watcher ["view/" "template/" "components/" "resource/"]
     (rate 500) ;; poll every 500ms
     (file-filter ignore-dotfiles) ;; add a filter for the files we care about
     (file-filter (extensions :html :css :js)) ;; filter by extensions
