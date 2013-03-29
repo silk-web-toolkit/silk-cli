@@ -26,7 +26,7 @@
 
 (defn- delete-directory
   [d]
-  (doseq [f (reverse (file-seq (File. d)))] (delete-file f)))
+  (doseq [f (reverse (file-seq (file d)))] (delete-file f)))
 
 (defn- copy-recursive
   [src dest]
