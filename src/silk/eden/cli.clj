@@ -26,8 +26,6 @@
 
 (def c-state (atom nil))
 
-(def m-state (atom "test"))
-
 (defn- build-component
   [i]
   (let [comp-str (str ((split i #":") 1) ".html")
@@ -80,7 +78,7 @@
     (assoc t :content @c-state)))
 
 (defn- relativise-attr
-  [v p]
+  [v p m]
   (let [vp (.getParent (File. p))]
     (if-not (nil? vp)
       (let [pv (path/parse-path v)
@@ -91,15 +89,15 @@
                      (.getParent (File. se/views-path p))
                      se/views-path)]
             (str rel "/" v))))
-      (if (= @m-state "live") (str "/" v) v))))
+      (if (= m "live") (str "/" v) v))))
 
 (defn- attrib-rewrite
-  [e a p]
+  [e a p m]
   (let [page (l/parse (:content p))
         uri-tx (l/document
                  page
                  (l/and (l/element= e) (l/attr? a))
-                   (l/update-attr a relativise-attr (:file p)))]
+                   (l/update-attr a relativise-attr (:file p) m))]
     (assoc p :content uri-tx)))
 
 (defn- spin
@@ -107,12 +105,11 @@
   (let [views (sf/get-views)
         templated-views (map #(view-inject %) views)
         pages (map #(process-components %) templated-views)
-        link-rewritten (map #(attrib-rewrite :link :href %) pages)
-        img-rewritten (map #(attrib-rewrite :img :src %) link-rewritten)
-        script-rewritten (map #(attrib-rewrite :script :src %) img-rewritten)
-        a-rewritten (map #(attrib-rewrite :a :href %) script-rewritten)]
+        link-rewritten (map #(attrib-rewrite :link :href % (first args)) pages)
+        img-rewritten (map #(attrib-rewrite :img :src % (first args)) link-rewritten)
+        script-rewritten (map #(attrib-rewrite :script :src % (first args)) img-rewritten)
+        a-rewritten (map #(attrib-rewrite :a :href % (first args)) script-rewritten)]
     (println "Spinning your site...")
-    (if-not (nil? (first args)) (reset! m-state (first args)))
     (ugly-side-effecting-io)
     (doseq [t a-rewritten]
       (let [parent (.getParent (new File (:file t)))]
