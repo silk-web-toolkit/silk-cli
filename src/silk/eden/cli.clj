@@ -2,6 +2,7 @@
   (:require [clojure.java.io :refer [copy delete-file file]]
             [me.raynes.laser :as l]
             [pathetic.core :as path]
+            [me.rossputin.diskops :as do]
             [silk.input.env :as se]
             [silk.input.file :as sf])
   (:use [clojure.string :only [split]]
@@ -23,17 +24,6 @@
 (def c-state (atom nil))
 
 (def m-state (atom "test"))
-
-(defn- delete-directory
-  [d]
-  (doseq [f (reverse (file-seq (file d)))] (delete-file f)))
-
-(defn- copy-recursive
-  [src dest]
-  (doseq [f (remove #(.isDirectory %) (file-seq (file src)))]
-    (let [dest-file (file dest f)]
-      (.mkdirs (.getParentFile dest-file))
-      (copy f dest-file))))
 
 (defn- build-component
   [i]
@@ -122,10 +112,10 @@
     (ascii-art)
     (println "")
     (println "v0.2.0-pre.2")
-    (when (.exists (File. "site")) (delete-directory "site"))
+    (when (.exists (File. "site")) (do/delete-directory "site"))
     (.mkdir (new File "site"))
-    (copy-recursive "resource" "site")
-    (copy-recursive "meta" "site")
+    (do/copy-recursive "resource" "site")
+    (do/copy-recursive "meta" "site")
     (println "Spinning your site...")
     (doseq [t a-rewritten]
       (let [parent (.getParent (new File (:file t)))]
