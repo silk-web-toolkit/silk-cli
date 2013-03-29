@@ -6,7 +6,8 @@
             [silk.input.env :as se]
             [silk.input.file :as sf])
   (:use [clojure.string :only [split]]
-        [watchtower.core])
+        [watchtower.core]
+        [silk.eden.io])
   (import java.io.File)
   (:gen-class))
 
@@ -14,12 +15,14 @@
 ;; Helper functions
 ;; =============================================================================
 
-(defn- ascii-art
+(defn- cli-app-banner-display
   []
   (println "    _ _ _")
   (println " __(_) | |__")
   (println "(_-< | | / /")
-  (println "/__/_|_|_\\_\\"))
+  (println "/__/_|_|_\\_\\")
+  (println "")
+  (println "v0.2.0-pre.2"))
 
 (def c-state (atom nil))
 
@@ -109,14 +112,8 @@
         script-rewritten (map #(attrib-rewrite :script :src %) img-rewritten)
         a-rewritten (map #(attrib-rewrite :a :href %) script-rewritten)]
     (if-not (nil? (first args)) (reset! m-state (first args)))
-    (ascii-art)
-    (println "")
-    (println "v0.2.0-pre.2")
-    (when (.exists (File. "site")) (do/delete-directory "site"))
-    (.mkdir (new File "site"))
-    (do/copy-recursive "resource" "site")
-    (do/copy-recursive "meta" "site")
-    (println "Spinning your site...")
+    (cli-app-banner-display)
+    (ugly-side-effecting-io)
     (doseq [t a-rewritten]
       (let [parent (.getParent (new File (:file t)))]
         (when-not (nil? parent) (.mkdirs (File. "site" parent)))
