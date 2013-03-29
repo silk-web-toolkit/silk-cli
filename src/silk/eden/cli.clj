@@ -111,8 +111,8 @@
         img-rewritten (map #(attrib-rewrite :img :src %) link-rewritten)
         script-rewritten (map #(attrib-rewrite :script :src %) img-rewritten)
         a-rewritten (map #(attrib-rewrite :a :href %) script-rewritten)]
+    (println "Spinning your site...")
     (if-not (nil? (first args)) (reset! m-state (first args)))
-    (cli-app-banner-display)
     (ugly-side-effecting-io)
     (doseq [t a-rewritten]
       (let [parent (.getParent (new File (:file t)))]
@@ -139,6 +139,7 @@
 ;; =============================================================================
 
 (defn -main [& args]
+  (cli-app-banner-display)
   (if (= (first args) "reload")
     (reload)
     (spin args)))

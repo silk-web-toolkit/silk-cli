@@ -11,5 +11,4 @@
   (when (.exists (File. "site")) (do/delete-directory "site"))
   (.mkdir (new File "site"))
   (do/copy-recursive "resource" "site")
-  (do/copy-recursive "meta" "site")
-  (println "Spinning your site..."))
+  (do/copy-recursive "meta" "site"))
