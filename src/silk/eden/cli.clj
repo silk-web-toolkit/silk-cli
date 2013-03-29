@@ -35,8 +35,6 @@
       (.mkdirs (.getParentFile dest-file))
       (copy f dest-file))))
 
-(defn- get-views [] (remove #(.isDirectory %) (file-seq (file se/views-path))))
-
 (defn- build-component
   [i]
   (let [comp-str (str ((split i #":") 1) ".html")
@@ -113,7 +111,7 @@
 
 (defn- spin
   [args]
-  (let [views (get-views)
+  (let [views (sf/get-views)
         templated-views (map #(view-inject %) views)
         pages (map #(process-components %) templated-views)
         link-rewritten (map #(attrib-rewrite :link :href %) pages)
