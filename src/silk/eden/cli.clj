@@ -4,7 +4,8 @@
             [pathetic.core :as path]
             [me.rossputin.diskops :as do]
             [silk.input.env :as se]
-            [silk.input.file :as sf])
+            [silk.input.file :as sf]
+            [silk.transform.path :as sp])
   (:use [clojure.string :only [split]]
         [watchtower.core]
         [silk.eden.io])
@@ -35,14 +36,6 @@
     (l/select parsed-comp
               (l/child-of (l/element= :body) (l/any)))))
 
-(defn- relativise
-  "Relativise two paths, prepping Windows paths."
-  [a b]
-  (let [doze? (if (re-find #"indow" (System/getProperty "os.name")) true false)
-        pa (if doze? (.replaceAll ((split a #":") 1) "\\\\" "/") a)
-        pb (if doze? (.replaceAll ((split b #":") 1) "\\\\" "/") b)]
-    (path/relativize pa pb)))
-
 (defn- view-inject
   [v]
   (let [parsed-view (l/parse v)
@@ -52,7 +45,7 @@
                    (sf/template
                     (str (:content (:attrs (first meta-template))) ".html"))
                    (sf/template "default.html"))]
-    {:file (relativise se/views-path (.getPath v))
+    {:file (sp/relativise-> se/views-path (.getPath v))
      :content (l/document
                 (l/parse template)
                 (l/id="silk-view")
@@ -85,7 +78,7 @@
             parsed-uri (some #{"http:" "https:" "mailto:"} pv)]
         (if-not (nil? parsed-uri)
           v
-          (let [rel (relativise
+          (let [rel (sp/relativise->
                      (.getParent (File. se/views-path p))
                      se/views-path)]
             (str rel "/" v))))
