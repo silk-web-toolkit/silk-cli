@@ -103,7 +103,7 @@
         script-rewritten (map #(attrib-rewrite :script :src % (first args)) img-rewritten)
         a-rewritten (map #(attrib-rewrite :a :href % (first args)) script-rewritten)]
     (println "Spinning your site...")
-    (ugly-side-effecting-io)
+    (side-effecting-spin-io)
     (doseq [t a-rewritten]
       (let [parent (.getParent (new File (:file t)))]
         (when-not (nil? parent) (.mkdirs (File. "site" parent)))

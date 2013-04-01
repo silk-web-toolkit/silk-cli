@@ -6,7 +6,7 @@
 ;; Ugly side effecting IO
 ;; =============================================================================
 
-(defn ugly-side-effecting-io
+(defn side-effecting-spin-io
   []
   (when (.exists (File. "site")) (do/delete-directory "site"))
   (.mkdir (new File "site"))
