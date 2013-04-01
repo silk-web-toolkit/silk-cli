@@ -6,6 +6,15 @@
 ;; Ugly side effecting IO
 ;; =============================================================================
 
+(defn cli-app-banner-display
+  []
+  (println "    _ _ _")
+  (println " __(_) | |__")
+  (println "(_-< | | / /")
+  (println "/__/_|_|_\\_\\")
+  (println "")
+  (println "v0.2.0-pre.2"))
+
 (defn side-effecting-spin-io
   []
   (when (.exists (File. "site")) (do/delete-directory "site"))

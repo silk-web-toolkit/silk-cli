@@ -16,15 +16,6 @@
 ;; Helper functions
 ;; =============================================================================
 
-(defn- cli-app-banner-display
-  []
-  (println "    _ _ _")
-  (println " __(_) | |__")
-  (println "(_-< | | / /")
-  (println "/__/_|_|_\\_\\")
-  (println "")
-  (println "v0.2.0-pre.2"))
-
 (def c-state (atom nil))
 
 (defn- build-component
