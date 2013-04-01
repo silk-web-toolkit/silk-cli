@@ -5,7 +5,8 @@
             [me.rossputin.diskops :as do]
             [silk.input.env :as se]
             [silk.input.file :as sf]
-            [silk.transform.path :as sp])
+            [silk.transform.path :as sp]
+            [silk.transform.element :as sel])
   (:use [clojure.string :only [split]]
         [watchtower.core]
         [silk.eden.io])
@@ -36,7 +37,7 @@
                    (sf/template
                     (str (:content (:attrs (first meta-template))) ".html"))
                    (sf/template "default.html"))]
-    {:file (sp/relativise-> se/views-path (.getPath v))
+    {:path (sp/relativise-> se/views-path (.getPath v))
      :content (l/document
                 (l/parse template)
                 (l/id="silk-view")
@@ -61,44 +62,21 @@
       (component-inject id))
     (assoc t :content @c-state)))
 
-(defn- relativise-attr
-  [v p m]
-  (let [vp (.getParent (File. p))]
-    (if-not (nil? vp)
-      (let [pv (path/parse-path v)
-            parsed-uri (some #{"http:" "https:" "mailto:"} pv)]
-        (if-not (nil? parsed-uri)
-          v
-          (let [rel (sp/relativise->
-                     (.getParent (File. se/views-path p))
-                     se/views-path)]
-            (str rel "/" v))))
-      (if (= m "live") (str "/" v) v))))
-
-(defn- attrib-rewrite
-  [e a p m]
-  (let [page (l/parse (:content p))
-        uri-tx (l/document
-                 page
-                 (l/and (l/element= e) (l/attr? a))
-                   (l/update-attr a relativise-attr (:file p) m))]
-    (assoc p :content uri-tx)))
-
 (defn- spin
   [args]
   (let [views (sf/get-views)
         templated-views (map #(view-inject %) views)
         pages (map #(process-components %) templated-views)
-        link-rewritten (map #(attrib-rewrite :link :href % (first args)) pages)
-        img-rewritten (map #(attrib-rewrite :img :src % (first args)) link-rewritten)
-        script-rewritten (map #(attrib-rewrite :script :src % (first args)) img-rewritten)
-        a-rewritten (map #(attrib-rewrite :a :href % (first args)) script-rewritten)]
+        link-rewritten (map #(sel/relativise-attrs :link :href % (first args)) pages)
+        img-rewritten (map #(sel/relativise-attrs :img :src % (first args)) link-rewritten)
+        script-rewritten (map #(sel/relativise-attrs :script :src % (first args)) img-rewritten)
+        a-rewritten (map #(sel/relativise-attrs :a :href % (first args)) script-rewritten)]
     (println "Spinning your site...")
     (side-effecting-spin-io)
     (doseq [t a-rewritten]
-      (let [parent (.getParent (new File (:file t)))]
+      (let [parent (.getParent (new File (:path t)))]
         (when-not (nil? parent) (.mkdirs (File. "site" parent)))
-        (spit (str se/site-path (:file t)) (:content t))))
+        (spit (str se/site-path (:path t)) (:content t))))
     (println "Site spinning is complete, we hope you like it.")))
 
 (defn- reload-report
