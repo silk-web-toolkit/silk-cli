@@ -66,8 +66,9 @@
   [args]
   (let [views (sf/get-views)
         templated-views (map #(view-inject %) views)
-        pages (map #(process-components %) templated-views)
-        link-rewritten (map #(sel/relativise-attrs :link :href % (first args)) pages)
+        comp-parse-1 (map #(process-components %) templated-views)
+        comp-parse-2 (map #(process-components %) comp-parse-1)
+        link-rewritten (map #(sel/relativise-attrs :link :href % (first args)) comp-parse-2)
         img-rewritten (map #(sel/relativise-attrs :img :src % (first args)) link-rewritten)
         script-rewritten (map #(sel/relativise-attrs :script :src % (first args)) img-rewritten)
         a-rewritten (map #(sel/relativise-attrs :a :href % (first args)) script-rewritten)]
