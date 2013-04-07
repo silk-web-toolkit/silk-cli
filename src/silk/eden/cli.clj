@@ -23,7 +23,7 @@
   [i]
   (let [comp-str (str ((split i #":") 1) ".html")
         lcp (str se/pwd se/fs "components" se/fs comp-str)
-        c-path (if (.exists (File. lcp)) (file lcp) (sf/component comp-str))
+        c-path (if (.exists (file lcp)) (file lcp) (sf/component comp-str))
         parsed-comp (l/parse c-path)]
     (l/select parsed-comp
               (l/child-of (l/element= :body) (l/any)))))
