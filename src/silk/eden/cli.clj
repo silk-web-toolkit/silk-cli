@@ -7,7 +7,8 @@
             [silk.input.file :as sf]
             [silk.transform.path :as sp]
             [silk.transform.element :as sel]
-            [silk.transform.component :as sc])
+            [silk.transform.component :as sc]
+            [silk.transform.view :as sv])
   (:use [clojure.string :only [split]]
         [watchtower.core]
         [silk.eden.io])
@@ -19,23 +20,6 @@
 ;; =============================================================================
 
 (def c-state (atom nil))
-
-(defn- view-inject
-  [v]
-  (let [parsed-view (l/parse v)
-        meta-template (l/select parsed-view
-                       (l/and (l/element= :meta) (l/attr= :name "template")))
-        template (if-not (nil? (first meta-template))
-                   (sf/template
-                    (str (:content (:attrs (first meta-template))) ".html"))
-                   (sf/template "default.html"))]
-    {:path (sp/relativise-> se/views-path (.getPath v))
-     :content (l/document
-                (l/parse template)
-                (l/id="silk-view")
-                  (l/replace
-                    (l/select parsed-view
-                      (l/child-of (l/element= :body) (l/any)))))}))
 
 (defn- component-inject
   [i]
@@ -56,8 +40,7 @@
 
 (defn- spin
   [args]
-  (let [views (sf/get-views)
-        templated-views (map #(view-inject %) views)
+  (let [templated-views (sv/template-wrap->)
         comp-parse-1 (map #(process-components %) templated-views)
         comp-parse-2 (map #(process-components %) comp-parse-1)
         link-rewritten (map #(sel/relativise-attrs :link :href % (first args)) comp-parse-2)
