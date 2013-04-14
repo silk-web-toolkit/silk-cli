@@ -22,21 +22,19 @@
 (def c-state (atom nil))
 
 (defn- component-inject
-  [i]
-   (let [injected (l/document
-                  (l/parse @c-state)
-                  (l/id= i)
-                  (l/replace (sc/build-component i)))]
-    (reset! c-state injected)))
+  [c i]
+   (l/document
+     (l/parse c)
+       (l/id= i)
+       (l/replace (sc/build-component i))))
 
 (defn- process-components
   [t]
   (let [comps (l/select (l/parse (:content t)) (l/re-id #"silk-component"))
         comp-ids (map #(:id (:attrs %)) comps)]
-    (reset! c-state (:content t))
-    (doseq [id comp-ids]
-      (component-inject id))
-    (assoc t :content @c-state)))
+    (assoc t :content
+      (first (as-> (:content t) page
+      (map #(component-inject page %) comp-ids))))))
 
 (defn- spin
   [args]
