@@ -19,8 +19,6 @@
 ;; Helper functions
 ;; =============================================================================
 
-(def c-state (atom nil))
-
 (defn- component-inject
   [c i]
    (l/document
