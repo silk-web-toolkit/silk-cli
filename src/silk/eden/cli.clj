@@ -1,9 +1,5 @@
 (ns silk.eden.cli
-  (:require [clojure.java.io :refer [copy delete-file file]]
-            [me.rossputin.diskops :as do]
-            [silk.input.env :as se]
-            [silk.input.file :as sf]
-            [silk.transform.path :as sp]
+  (:require [silk.input.env :as se]
             [silk.transform.element :as sel]
             [silk.transform.component :as sc]
             [silk.transform.view :as sv])
