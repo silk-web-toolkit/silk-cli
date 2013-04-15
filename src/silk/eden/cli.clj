@@ -1,7 +1,5 @@
 (ns silk.eden.cli
   (:require [clojure.java.io :refer [copy delete-file file]]
-            [me.raynes.laser :as l]
-            [pathetic.core :as path]
             [me.rossputin.diskops :as do]
             [silk.input.env :as se]
             [silk.input.file :as sf]
@@ -19,26 +17,11 @@
 ;; Helper functions
 ;; =============================================================================
 
-(defn- component-inject
-  [c i]
-   (l/document
-     (l/parse c)
-       (l/id= i)
-       (l/replace (sc/build-component i))))
-
-(defn- process-components
-  [t]
-  (let [comps (l/select (l/parse (:content t)) (l/re-id #"silk-component"))
-        comp-ids (map #(:id (:attrs %)) comps)]
-    (assoc t :content
-      (first (as-> (:content t) page
-      (map #(component-inject page %) comp-ids))))))
-
 (defn- spin
   [args]
   (let [templated-views (sv/template-wrap->)
-        comp-parse-1 (map #(process-components %) templated-views)
-        comp-parse-2 (map #(process-components %) comp-parse-1)
+        comp-parse-1 (map #(sc/process-components %) templated-views)
+        comp-parse-2 (map #(sc/process-components %) comp-parse-1)
         link-rewritten (map #(sel/relativise-attrs :link :href % (first args)) comp-parse-2)
         img-rewritten (map #(sel/relativise-attrs :img :src % (first args)) link-rewritten)
         script-rewritten (map #(sel/relativise-attrs :script :src % (first args)) img-rewritten)
