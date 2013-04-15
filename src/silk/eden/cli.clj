@@ -2,7 +2,8 @@
   (:require [silk.input.env :as se]
             [silk.transform.element :as sel]
             [silk.transform.component :as sc]
-            [silk.transform.view :as sv])
+            [silk.transform.view :as sv]
+            [silk.transform.pipeline :as pipes])
   (:use [clojure.string :only [split]]
         [watchtower.core]
         [silk.eden.io])
@@ -15,10 +16,8 @@
 
 (defn- spin
   [args]
-  (let [templated-views (sv/template-wrap->)
-        comp-parse-1 (map #(sc/process-components %) templated-views)
-        comp-parse-2 (map #(sc/process-components %) comp-parse-1)
-        link-rewritten (map #(sel/relativise-attrs :link :href % (first args)) comp-parse-2)
+  (let [vdp (pipes/view-driven-pipeline->)
+        link-rewritten (map #(sel/relativise-attrs :link :href % (first args)) vdp)
         img-rewritten (map #(sel/relativise-attrs :img :src % (first args)) link-rewritten)
         script-rewritten (map #(sel/relativise-attrs :script :src % (first args)) img-rewritten)
         a-rewritten (map #(sel/relativise-attrs :a :href % (first args)) script-rewritten)]
