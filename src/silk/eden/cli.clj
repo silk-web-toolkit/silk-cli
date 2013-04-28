@@ -16,14 +16,10 @@
 
 (defn- spin
   [args]
-  (let [vdp (pipes/view-driven-pipeline->)
-        link-rewritten (map #(sel/relativise-attrs :link :href % (first args)) vdp)
-        img-rewritten (map #(sel/relativise-attrs :img :src % (first args)) link-rewritten)
-        script-rewritten (map #(sel/relativise-attrs :script :src % (first args)) img-rewritten)
-        a-rewritten (map #(sel/relativise-attrs :a :href % (first args)) script-rewritten)]
+  (let [vdp (pipes/view-driven-pipeline-> (first args))]
     (println "Spinning your site...")
     (side-effecting-spin-io)
-    (doseq [t a-rewritten]
+    (doseq [t vdp]
       (let [parent (.getParent (new File (:path t)))]
         (when-not (nil? parent) (.mkdirs (File. "site" parent)))
         (spit (str se/site-path (:path t)) (:content t))))
