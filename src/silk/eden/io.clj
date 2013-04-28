@@ -13,7 +13,7 @@
   (println "(_-< | | / /")
   (println "/__/_|_|_\\_\\")
   (println "")
-  (println "v0.2.0-pre.4"))
+  (println "v0.2.0-alpha.1"))
 
 (defn side-effecting-spin-io
   []

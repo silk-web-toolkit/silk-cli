@@ -1,4 +1,4 @@
-(defproject silk-eden "0.2.0-pre.4"
+(defproject silk-eden "0.2.0-alpha.1"
   :description "Silk compile time command line interface."
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.5.1"]
