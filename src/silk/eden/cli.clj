@@ -32,11 +32,17 @@
 
 (defn- reload
   []
-  (watcher ["view/" "template/" "components/" "resource/"]
+  (def fut (future (watcher ["view/" "template/" "components/" "resource/"]
     (rate 500) ;; poll every 500ms
     (file-filter ignore-dotfiles) ;; add a filter for the files we care about
     (file-filter (extensions :html :css :js)) ;; filter by extensions
-    (on-change #(reload-report %))))
+    (on-change #(reload-report %)))))
+
+  (println "Press enter to exit")
+  (loop [input (read-line)]
+    (when-not (= "\n" input)
+      (System/exit 0)
+      (recur (read-line)))))
 
 
 ;; =============================================================================
