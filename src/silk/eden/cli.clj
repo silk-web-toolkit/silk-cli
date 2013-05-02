@@ -1,8 +1,5 @@
 (ns silk.eden.cli
   (:require [silk.input.env :as se]
-            [silk.transform.element :as sel]
-            [silk.transform.component :as sc]
-            [silk.transform.view :as sv]
             [silk.transform.pipeline :as pipes])
   (:use [clojure.string :only [split]]
         [watchtower.core]
@@ -49,7 +46,9 @@
 ;; Application entry point
 ;; =============================================================================
 
-(defn -main [& args]
+(defn -main
+  [& args]
+  {:pre [(is-silk-project?)]}
   (cli-app-banner-display)
   (if (= (first args) "reload")
     (reload)

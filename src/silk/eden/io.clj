@@ -1,5 +1,6 @@
 (ns silk.eden.io
-  (:require [me.rossputin.diskops :as do])
+  (:require [clojure.java.io :refer [file]]
+            [me.rossputin.diskops :as do])
   (import java.io.File))
 
 ;; =============================================================================
@@ -15,9 +16,18 @@
   (println "")
   (println "v0.2.0-alpha.1"))
 
+(defn is-dir?
+  [d]
+  (.exists (file d)))
+
 (defn side-effecting-spin-io
   []
-  (when (.exists (File. "site")) (do/delete-directory "site"))
+  (when (is-dir? "site") (do/delete-directory "site"))
   (.mkdir (new File "site"))
   (do/copy-recursive "resource" "site")
   (do/copy-recursive "meta" "site"))
+
+(defn is-silk-project?
+  []
+  (and
+   (is-dir? "view") (is-dir? "template") (is-dir? "resource") (is-dir? "meta")))
