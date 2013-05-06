@@ -4,7 +4,7 @@
   (:use [clojure.string :only [split]]
         [watchtower.core]
         [silk.eden.io])
-  (import java.io.File)
+  (import java.io.File java.io.FileNotFoundException)
   (:gen-class))
 
 ;; =============================================================================
@@ -56,8 +56,9 @@
   [f & args]
   (try
     (apply f args)
-    (catch Exception ex
-      (println "ERROR: Sorry, there was a problem, is this a silk project ?"))))
+    (catch FileNotFoundException ex
+      (println "ERROR: Sorry, there was a problem, is this a silk project ?")
+      (println (str "Cause of error: " (.getMessage ex))))))
 
 (def launch-handled (handler launch handle-silk-project-exception))
 
