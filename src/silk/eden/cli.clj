@@ -41,6 +41,26 @@
       (System/exit 0)
       (recur (read-line)))))
 
+(defn launch
+  [args]
+  (cli-app-banner-display)
+  (if (= (first args) "reload")
+    (reload)
+    (spin args)))
+
+(defn handler
+  [f & handlers]
+  (reduce (fn [handled h] (partial h handled)) f (reverse handlers)))
+
+(defn handle-silk-project-exception
+  [f & args]
+  (try
+    (apply f args)
+    (catch Exception ex
+      (println "ERROR: Sorry, there was a problem, is this a silk project ?"))))
+
+(def launch-handled (handler launch handle-silk-project-exception))
+
 
 ;; =============================================================================
 ;; Application entry point
@@ -48,8 +68,4 @@
 
 (defn -main
   [& args]
-  {:pre [(is-silk-project?)]}
-  (cli-app-banner-display)
-  (if (= (first args) "reload")
-    (reload)
-    (spin args)))
+  (launch-handled args))
