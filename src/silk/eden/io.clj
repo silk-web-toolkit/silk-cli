@@ -14,7 +14,7 @@
   (println "(_-< | | / /")
   (println "/__/_|_|_\\_\\")
   (println "")
-  (println "v0.2.0"))
+  (println "v0.2.1"))
 
 (defn is-dir?
   [d]
