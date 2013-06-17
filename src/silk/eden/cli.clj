@@ -44,6 +44,9 @@
 (defn launch
   [args]
   (cli-app-banner-display)
+  (if (not (is-silk-project?))
+    (do
+      (throw (IllegalArgumentException. "Not a Silk project, one of template, view, components or resource directory are missing."))))
   (if (= (first args) "reload")
     (reload)
     (spin args)))
@@ -56,8 +59,11 @@
   [f & args]
   (try
     (apply f args)
+    (catch IllegalArgumentException iex
+      (println "ERROR: Sorry, this is not a Silk project.")
+      (println (str "Cause of error: " (.getMessage iex))))
     (catch FileNotFoundException ex
-      (println "ERROR: Sorry, there was a problem, is this a silk project ?")
+      (println "ERROR: Sorry, there was a problem, either a component is missing or this is not a silk project ?")
       (println (str "Cause of error: " (.getMessage ex))))))
 
 (def launch-handled (handler launch handle-silk-project-exception))
