@@ -1,9 +1,12 @@
-(defproject silk-eden "0.1.0-SNAPSHOT"
-  :description "Silk compile time, habitat for templates, components, inputs and transformations."
+(defproject silk-eden "0.2.2"
+  :description "Silk compile time command line interface."
   :min-lein-version "2.0.0"
-  :dependencies [[org.clojure/clojure "1.4.0"]
-                 [me.raynes/laser "0.1.22"]
-                 [silk "0.2.0-SNAPSHOT"]]
+  :dependencies [[org.clojure/clojure "1.5.1"]
+                 [me.raynes/laser "1.1.1"]
+                 [me.rossputin/diskops "0.1.0"]
+                 [pathetic "0.4.0"]
+                 [watchtower/watchtower "0.1.1"]
+                 [silk "0.2.1"]]
 
   :aot :all
   :main silk.eden.cli)
