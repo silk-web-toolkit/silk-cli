@@ -7,6 +7,11 @@
 ;; Ugly side effecting IO
 ;; =============================================================================
 
+(defmacro get-version []
+  (System/getProperty "silk-eden.version"))
+
+(def version (get-version))
+
 (defn cli-app-banner-display
   []
   (println "    _ _ _")
@@ -14,7 +19,7 @@
   (println "(_-< | | / /")
   (println "/__/_|_|_\\_\\")
   (println "")
-  (println "v0.2.2"))
+  (println (str "v" version)))
 
 (defn is-dir?
   [d]
