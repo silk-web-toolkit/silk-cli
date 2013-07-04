@@ -6,7 +6,7 @@
                  [me.rossputin/diskops "0.1.0"]
                  [pathetic "0.4.0"]
                  [watchtower/watchtower "0.1.1"]
-                 [silk "0.2.1"]]
+                 [silk "0.3.0"]]
 
   :aot :all
   :main silk.eden.cli)
