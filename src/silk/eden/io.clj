@@ -36,3 +36,7 @@
   []
   (and
    (is-dir? "view") (is-dir? "template") (is-dir? "resource") (is-dir? "meta")))
+
+(defn is-silk-configured?
+  []
+  (and (System/getenv "SILK_COMPONENTS_PATH") (System/getenv "SILK_DATA_PATH")))

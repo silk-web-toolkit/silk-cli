@@ -47,6 +47,9 @@
   (if (not (is-silk-project?))
     (do
       (throw (IllegalArgumentException. "Not a Silk project, one of template, view, components or resource directory are missing."))))
+  (if (not (is-silk-configured?))
+    (do
+      (throw (IllegalArgumentException. "Silk is not configured, please ensure SILK_COMPONENTS_PATH and SILK_DATA_PATH are set up as environment variables."))))
   (if (= (first args) "reload")
     (reload)
     (spin args)))
