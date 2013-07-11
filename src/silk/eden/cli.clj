@@ -63,7 +63,7 @@
   (try
     (apply f args)
     (catch IllegalArgumentException iex
-      (println "ERROR: Sorry, this is not a Silk project.")
+      (println "ERROR: Sorry, either Silk is not configured properly or there is a problem with this Silk project.")
       (println (str "Cause of error: " (.getMessage iex))))
     (catch FileNotFoundException ex
       (println "ERROR: Sorry, there was a problem, either a component is missing or this is not a silk project ?")
