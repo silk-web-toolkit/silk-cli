@@ -35,7 +35,8 @@
 (defn is-silk-project?
   []
   (and
-   (is-dir? "view") (is-dir? "template") (is-dir? "resource") (is-dir? "meta")))
+   (is-dir? "view") (is-dir? "template") (is-dir? "resource") (is-dir? "meta")
+   (is-dir? "components") (is-dir? "data")))
 
 (defn is-silk-configured?
   []

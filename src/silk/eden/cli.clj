@@ -46,7 +46,7 @@
   (cli-app-banner-display)
   (if (not (is-silk-project?))
     (do
-      (throw (IllegalArgumentException. "Not a Silk project, one of template, view, components or resource directory are missing."))))
+      (throw (IllegalArgumentException. "Not a Silk project, a directory may be missing - template, view, components, data, resource or meta ?."))))
   (if (not (is-silk-configured?))
     (do
       (throw (IllegalArgumentException. "Silk is not configured, please ensure SILK_COMPONENTS_PATH and SILK_DATA_PATH are set up as environment variables."))))
