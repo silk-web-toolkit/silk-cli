@@ -8,7 +8,7 @@
 ;; =============================================================================
 
 (defmacro get-version []
-  (System/getProperty "silk-eden.version"))
+  (System/getProperty "silk.version"))
 
 (def version (get-version))
 
