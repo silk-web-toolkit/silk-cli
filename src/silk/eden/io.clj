@@ -1,5 +1,6 @@
 (ns silk.eden.io
-  (:require [clojure.java.io :refer [file]]
+  (:require [silk.input.env :as se]
+            [clojure.java.io :refer [file]]
             [me.rossputin.diskops :as do])
   (import java.io.File))
 
@@ -40,4 +41,6 @@
 
 (defn is-silk-configured?
   []
-  (and (System/getenv "SILK_COMPONENTS_PATH") (System/getenv "SILK_DATA_PATH")))
+  (println se/components-path)
+  (and 
+    (is-dir? se/components-path) (is-dir? se/data-path)))
