@@ -51,7 +51,7 @@
       (throw (IllegalArgumentException. "Not a Silk project, a directory may be missing - template, view, components, data, resource or meta ?."))))
   (if (not (is-silk-configured?))
     (do
-      (throw (IllegalArgumentException. "Silk is not configured, please ensure SILK_COMPONENTS_PATH and SILK_DATA_PATH are set up as environment variables."))))
+      (throw (IllegalArgumentException. "Silk is not configured, please ensure your SILK_PATH is setup and contains a components and data directory."))))
   (if (= (first args) "reload")
     (reload)
     (spin args)))
