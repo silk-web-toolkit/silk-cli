@@ -41,6 +41,5 @@
 
 (defn is-silk-configured?
   []
-  (println se/components-path)
   (and 
     (is-dir? se/components-path) (is-dir? se/data-path)))
