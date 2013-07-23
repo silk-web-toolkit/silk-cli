@@ -1,5 +1,6 @@
 (ns silk.eden.cli
   (:require [silk.input.env :as se]
+            [silk.input.file :as sf] 
             [silk.transform.pipeline :as pipes])
   (:use [clojure.string :only [split]]
         [watchtower.core]
@@ -20,6 +21,7 @@
       (let [parent (.getParent (new File (:path t)))]
         (when-not (nil? parent) (.mkdirs (File. "site" parent)))
         (spit (str se/site-path (:path t)) (:content t))))
+    (sf/store-project-dir)
     (println "Site spinning is complete, we hope you like it.")))
 
 (defn- reload-report
