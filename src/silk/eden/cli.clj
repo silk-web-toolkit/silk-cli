@@ -43,6 +43,12 @@
       (System/exit 0)
       (recur (read-line)))))
 
+(defn sites
+  []
+  (let [site-list (slurp se/spun-projects-file)]
+    (println "Your Silk sites are : ")
+    (println site-list)))
+
 (defn launch
   [args]
   (cli-app-banner-display)
@@ -52,9 +58,10 @@
   (if (not (is-silk-configured?))
     (do
       (throw (IllegalArgumentException. "Silk is not configured, please ensure your SILK_PATH is setup and contains a components and data directory."))))
-  (if (= (first args) "reload")
-    (reload)
-    (spin args)))
+  (cond
+   (= (first args) "reload") (reload)
+   (= (first args) "sites") (sites)
+   :else (spin args)))
 
 (defn handler
   [f & handlers]
