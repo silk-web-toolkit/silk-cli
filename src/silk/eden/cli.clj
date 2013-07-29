@@ -21,6 +21,7 @@
       (let [parent (.getParent (new File (:path t)))]
         (when-not (nil? parent) (.mkdirs (File. "site" parent)))
         (spit (str se/site-path (:path t)) (:content t))))
+    (create-detail-pages)
     (sf/store-project-dir)
     (println "Site spinning is complete, we hope you like it.")))
 

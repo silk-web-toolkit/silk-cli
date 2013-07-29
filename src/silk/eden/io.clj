@@ -1,8 +1,32 @@
 (ns silk.eden.io
   (:require [silk.input.env :as se]
+            [silk.input.file :as sf]
             [clojure.java.io :refer [file]]
             [me.rossputin.diskops :as do])
   (import java.io.File))
+
+;; =============================================================================
+;; Helper functions
+;; =============================================================================
+
+(defn- filter-file
+  [r]
+  (reify java.io.FilenameFilter
+    (accept [_ d name] (not (nil? (re-find r name))))))
+
+(defn- is-detail?
+  [d r]
+  (let [files (.list (file d) (filter-file r))]
+    (if (seq files) true false)))
+
+(defn process-detail-pages
+  []
+  (println (str "processing detail pages")))
+
+(defn process-index-pages
+  []
+  (println (str "processing index pages")))
+
 
 ;; =============================================================================
 ;; Ugly side effecting IO
@@ -41,5 +65,12 @@
 
 (defn is-silk-configured?
   []
-  (and 
-    (is-dir? se/components-path) (is-dir? se/data-path)))
+  (and
+   (is-dir? se/components-path) (is-dir? se/data-path)))
+
+(defn create-detail-pages
+  []
+  (let [data-dirs (sf/get-data-directories)]
+    (doseq [d data-dirs]
+      (println (str "d is : " d))
+      (if (is-detail? d #".edn") (process-detail-pages) (process-index-pages)))))
