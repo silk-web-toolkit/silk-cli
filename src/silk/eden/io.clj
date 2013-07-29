@@ -66,6 +66,13 @@
   (and
    (is-dir? se/components-path) (is-dir? se/data-path)))
 
+(defn create-view-driven-pages
+  [vdp]
+  (doseq [t vdp]
+    (let [parent (.getParent (new File (:path t)))]
+      (when-not (nil? parent) (.mkdirs (File. "site" parent)))
+      (spit (str se/site-path (:path t)) (:content t)))))
+
 (defn create-detail-pages
   []
   (let [data-dirs (sf/get-data-directories)]
