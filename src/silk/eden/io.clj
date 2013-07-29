@@ -19,11 +19,11 @@
   (let [files (.list (file d) (filter-file r))]
     (if (seq files) true false)))
 
-(defn process-detail-pages
+(defn- process-detail-pages
   []
   (println (str "processing detail pages")))
 
-(defn process-index-pages
+(defn- process-index-pages
   []
   (println (str "processing index pages")))
 
