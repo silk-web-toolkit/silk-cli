@@ -9,6 +9,9 @@
 ;; Helper functions
 ;; =============================================================================
 
+(defmacro get-version []
+  (System/getProperty "silk.version"))
+
 (defn- filter-file
   [r]
   (reify java.io.FilenameFilter
@@ -32,11 +35,6 @@
 ;; Ugly side effecting IO
 ;; =============================================================================
 
-(defmacro get-version []
-  (System/getProperty "silk.version"))
-
-(def version (get-version))
-
 (defn cli-app-banner-display
   []
   (println "    _ _ _")
@@ -44,7 +42,7 @@
   (println "(_-< | | / /")
   (println "/__/_|_|_\\_\\")
   (println "")
-  (println (str "v" version)))
+  (println (str "v" (get-version))))
 
 (defn is-dir?
   [d]
