@@ -5,7 +5,7 @@
   (:use [clojure.string :only [split]]
         [watchtower.core]
         [silk.eden.io])
-  (import java.io.File java.io.FileNotFoundException)
+  (import java.io.File)
   (:gen-class))
 
 ;; =============================================================================
@@ -15,16 +15,20 @@
 (defn- spin
   [args]
   (println "Spinning your site...")
+  (check-silk-configuration)
+  (check-silk-project-structure)
   (side-effecting-spin-io)
   (create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
   (create-data-driven-pages (first args))
   (store-project-dir)
   (println "Site spinning is complete, we hope you like it."))
 
+(def spin-handled (handler spin handle-silk-project-exception))
+
 (defn- reload-report
   [payload]
   (println "files changed : " payload)
-  (spin ["spin"]))
+  (spin-handled ["spin"]))
 
 (defn- reload
   []
@@ -42,41 +46,20 @@
 
 (defn sites
   []
+  (check-silk-configuration)
   (let [site-list (slurp se/spun-projects-file)]
     (println "Your Silk sites are : ")
     (println site-list)))
 
+(def sites-handled (handler sites handle-silk-project-exception))
+
 (defn launch
   [args]
   (cli-app-banner-display)
-  (if (not (is-silk-project?))
-    (do
-      (throw (IllegalArgumentException. "Not a Silk project, a directory may be missing - template, view, components, data, resource or meta ?."))))
-  (if (not (is-silk-configured?))
-    (do
-      (throw (IllegalArgumentException. "Silk is not configured, please ensure your SILK_PATH is setup and contains a components and data directory."))))
   (cond
    (= (first args) "reload") (reload)
-   (= (first args) "sites") (sites)
-   :else (spin args)))
-
-(defn handler
-  [f & handlers]
-  (reduce (fn [handled h] (partial h handled)) f (reverse handlers)))
-
-(defn handle-silk-project-exception
-  [f & args]
-  (try
-    (apply f args)
-    (catch IllegalArgumentException iex
-      (println "ERROR: Sorry, either Silk is not configured properly or there is a problem with this Silk project.")
-      (println (str "Cause of error: " (.getMessage iex))))
-    (catch FileNotFoundException ex
-      (println "ERROR: Sorry, there was a problem, either a component is missing or this is not a silk project ?")
-      (println (str "Cause of error: " (.getMessage ex))))))
-
-(def launch-handled (handler launch handle-silk-project-exception))
-
+   (= (first args) "sites")  (sites-handled)
+   :else (spin-handled args)))
 
 ;; =============================================================================
 ;; Application entry point
@@ -84,4 +67,4 @@
 
 (defn -main
   [& args]
-  (launch-handled args))
+  (launch args))
