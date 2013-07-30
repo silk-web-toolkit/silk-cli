@@ -14,15 +14,12 @@
 
 (defn- spin
   [args]
-  (let [vdp (pipes/view-driven-pipeline-> (first args))]
-    (println "Spinning your site...")
-    (side-effecting-spin-io)
-    (doseq [t vdp]
-      (let [parent (.getParent (new File (:path t)))]
-        (when-not (nil? parent) (.mkdirs (File. "site" parent)))
-        (spit (str se/site-path (:path t)) (:content t))))
-    (sf/store-project-dir)
-    (println "Site spinning is complete, we hope you like it.")))
+  (println "Spinning your site...")
+  (side-effecting-spin-io)
+  (create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
+  (create-data-driven-pages (first args))
+  (sf/store-project-dir)
+  (println "Site spinning is complete, we hope you like it."))
 
 (defn- reload-report
   [payload]
