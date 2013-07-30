@@ -1,6 +1,7 @@
 (ns silk.eden.io
   (:require [silk.input.env :as se]
             [silk.input.file :as sf]
+            [silk.transform.pipeline :as pipes]
             [clojure.java.io :refer [file]]
             [me.rossputin.diskops :as do])
   (import java.io.File))
@@ -22,13 +23,28 @@
   (let [files (.list (file d) (filter-file r))]
     (if (seq files) true false)))
 
-(defn- process-detail-pages
-  []
-  (println (str "processing detail pages")))
+;; (defn do-detail-page
+;;   [p]
+;;   (println (str "processing detail page : " p)))
 
-(defn- process-index-pages
-  []
-  (println (str "processing index pages")))
+(defn- do-detail-pages
+  [path mode]
+  (let [f (file path)
+        name (.getName f)
+        tpl (file (str se/pwd se/fs "template" se/fs "detail" se/fs name ".html"))]
+    (when (.exists (file tpl))
+      (let [details (pipes/data-detail-pipeline-> (.listFiles f) tpl mode)]
+        (doseq [d details] (let [parent (.getParent (new File (:path d)))]
+                             (println (str "d is : " d))
+      (when-not (nil? parent) (.mkdirs (File. "site" parent)))
+      ;;(spit (str se/site-path (:path d)) (:content d))
+      )))
+      )))
+
+(defn- do-index-pages
+  [d]
+  (println (str "processing data driven index pages"))
+  (println (str "d is : " d)))
 
 
 ;; =============================================================================
@@ -73,9 +89,9 @@
       (when-not (nil? parent) (.mkdirs (File. "site" parent)))
       (spit (str se/site-path (:path t)) (:content t)))))
 
-(defn create-detail-pages
-  []
+(defn create-data-driven-pages
+  [mode]
   (let [data-dirs (sf/get-data-directories)]
+    (println "wtf")
     (doseq [d data-dirs]
-      (println (str "d is : " d))
-      (if (is-detail? d #".edn") (process-detail-pages) (process-index-pages)))))
+      (if (is-detail? d #".edn") (do-detail-pages d mode) (do-index-pages d)))))
