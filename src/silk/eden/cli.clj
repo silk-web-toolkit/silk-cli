@@ -46,19 +46,20 @@
 
 (defn sites
   []
+  (check-silk-configuration)
   (let [site-list (slurp se/spun-projects-file)]
     (println "Your Silk sites are : ")
     (println site-list)))
+
+(def sites-handled (handler sites handle-silk-project-exception))
 
 (defn launch
   [args]
   (cli-app-banner-display)
   (cond
    (= (first args) "reload") (reload)
-   (= (first args) "sites")  (do (check-silk-configuration) (sites))
+   (= (first args) "sites")  (sites-handled)
    :else (spin-handled args)))
-
-(def launch-handled (handler launch handle-silk-project-exception))
 
 ;; =============================================================================
 ;; Application entry point
@@ -66,4 +67,4 @@
 
 (defn -main
   [& args]
-  (launch-handled args))
+  (launch args))
