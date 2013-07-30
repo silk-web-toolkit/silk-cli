@@ -20,7 +20,7 @@
   (side-effecting-spin-io)
   (create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
   (create-data-driven-pages (first args))
-  (sf/store-project-dir)
+  (store-project-dir)
   (println "Site spinning is complete, we hope you like it."))
 
 (def spin-handled (handler spin handle-silk-project-exception))

@@ -118,3 +118,10 @@
     (doseq [d data-dirs]
       (if (is-detail? d #".edn") (do-detail-pages d mode) (do-index-pages d)))))
 
+(defn store-project-dir
+  "Writes the current project directory to the central store."
+  []
+  (let [file se/spun-projects-file pwd se/pwd]
+    (if (not (.exists file)) (.createNewFile file))
+    (if (not (.contains (slurp (.getPath file)) pwd))
+      (spit (.getPath file) (str pwd "\n") :append true))))
