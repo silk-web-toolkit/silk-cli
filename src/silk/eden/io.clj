@@ -119,9 +119,15 @@
       (if (is-detail? d #".edn") (do-detail-pages d mode) (do-index-pages d)))))
 
 (defn store-project-dir
-  "Writes the current project directory to the central store."
+  "Writes the current project path and time to the central store."
   []
-  (let [file se/spun-projects-file pwd se/pwd]
-    (if (not (.exists file)) (.createNewFile file))
-    (if (not (.contains (slurp (.getPath file)) pwd))
-      (spit (.getPath file) (str pwd "\n") :append true))))
+  (let [f se/spun-projects-file]
+    (if (not (.exists f)) (.createNewFile f))
+    (let [path (.getPath f)
+          pattern (re-pattern (str se/pwd ",.*"))
+          millis (.getTime (new java.util.Date))
+          old (with-open [rdr (clojure.java.io/reader path)] (doall (line-seq rdr)))
+          removed (remove #(not (empty? (re-matches pattern %))) old)
+          formatted (apply str (map #(str % "\n") removed))
+          updated (conj [(str se/pwd "," millis "\n")]  formatted)]
+      (spit path (apply str updated)))))
