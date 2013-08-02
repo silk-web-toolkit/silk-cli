@@ -124,10 +124,9 @@
   (let [f se/spun-projects-file]
     (if (not (.exists f)) (.createNewFile f))
     (let [path (.getPath f)
-          pattern (re-pattern (str se/pwd ",.*"))
           millis (.getTime (new java.util.Date))
           old (with-open [rdr (clojure.java.io/reader path)] (doall (line-seq rdr)))
-          removed (remove #(not (empty? (re-matches pattern %))) old)
+          removed (remove #(.contains % (str se/pwd ",")) old)
           formatted (apply str (map #(str % "\n") removed))
           updated (conj [(str se/pwd "," millis "\n")]  formatted)]
       (spit path (apply str updated)))))
