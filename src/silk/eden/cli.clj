@@ -46,9 +46,14 @@
 (defn sites
   []
   (check-silk-configuration)
-  (let [site-list (slurp se/spun-projects-file)]
-    (println "Your Silk sites are : ")
-    (println site-list)))
+  (println "Your Silk sites are : ")
+  (with-open [rdr (clojure.java.io/reader se/spun-projects-file)]
+    (doseq [line (line-seq rdr)]
+      (let [split (clojure.string/split line #",")
+            path (first split)
+            date (new java.util.Date (read-string (second split)))
+            date-str (.format (new java.text.SimpleDateFormat) date)]
+        (println  "Last spun:" date-str path)))))
 
 (def sites-handled (handler sites handle-silk-project-exception))
 
