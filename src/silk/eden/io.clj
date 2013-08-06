@@ -52,7 +52,7 @@
   []
   (if (not (is-silk-configured?))
     (do
-      (throw (IllegalArgumentException. "Silk is not configured, please ensure your SILK_PATH is setup and contains a components and data directory.")))))
+      (throw (IllegalArgumentException. "Silk is not configured, please ensure your SILK_PATH is setup and contains a components directory.")))))
 
 (defn check-silk-project-structure
   []
