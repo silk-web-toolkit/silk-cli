@@ -13,35 +13,6 @@
 (defmacro get-version []
   (System/getProperty "silk.version"))
 
-(defn- filter-file
-  [r]
-  (reify java.io.FilenameFilter
-    (accept [_ d name] (not (nil? (re-find r name))))))
-
-(defn- is-detail?
-  [d r]
-  (let [files (.list (file d) (filter-file r))]
-    (if (seq files) true false)))
-
-(defn- do-detail-pages
-  [path mode]
-  (let [f (file path)
-        name (.getName f)
-        tpl (file (str se/pwd se/fs "template" se/fs "detail" se/fs name ".html"))]
-    (when (.exists (file tpl))
-      (let [details (pipes/data-detail-pipeline-> (.listFiles f) tpl mode)]
-        (doseq [d details]
-          (let [parent (.getParent (new File (:path d)))
-                raw (str se/site-path (:path d))
-                save-path (str (subs raw 0 (.lastIndexOf raw ".")) ".html")]
-            (when-not (nil? parent) (.mkdirs (File. "site" parent)))
-            (spit save-path (:content d))))))))
-
-(defn- do-index-pages
-  [d]
-  (println (str "processing data driven index pages"))
-  (println (str "d is : " d)))
-
 
 ;; =============================================================================
 ;; Ugly side effecting IO
@@ -65,24 +36,23 @@
   (when (is-dir? "site") (do/delete-directory "site"))
   (.mkdir (new File "site"))
   (do/copy-recursive "resource" "site")
-  (do/copy-recursive "meta" "site"))
+  (do/copy-recursive-children "meta" "site"))
 
 (defn is-silk-project?
   []
   (and
    (is-dir? "view") (is-dir? "template") (is-dir? "resource") (is-dir? "meta")
-   (is-dir? "components") (is-dir? "data")))
+   (is-dir? "components")))
 
 (defn is-silk-configured?
   []
-  (and 
-    (is-dir? se/components-path) (is-dir? se/data-path)))
+  (is-dir? se/components-path))
         
 (defn check-silk-configuration
   []
   (if (not (is-silk-configured?))
     (do
-      (throw (IllegalArgumentException. "Silk is not configured, please ensure your SILK_PATH is setup and contains a components and data directory.")))))
+      (throw (IllegalArgumentException. "Silk is not configured, please ensure your SILK_PATH is setup and contains a components directory.")))))
 
 (defn check-silk-project-structure
   []
@@ -111,12 +81,6 @@
     (let [parent (.getParent (new File (:path t)))]
       (when-not (nil? parent) (.mkdirs (File. "site" parent)))
       (spit (str se/site-path (:path t)) (:content t)))))
-
-(defn create-data-driven-pages
-  [mode]
-  (let [data-dirs (sf/get-data-directories)]
-    (doseq [d data-dirs]
-      (if (is-detail? d #".edn") (do-detail-pages d mode) (do-index-pages d)))))
 
 (defn store-project-dir
   "Writes the current project path and time to the central store."

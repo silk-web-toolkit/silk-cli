@@ -1,6 +1,6 @@
 (ns silk.eden.cli
   (:require [silk.input.env :as se]
-            [silk.input.file :as sf]
+            [silk.input.file :as sf] 
             [silk.transform.pipeline :as pipes])
   (:use [clojure.string :only [split]]
         [watchtower.core]
@@ -19,7 +19,6 @@
   (check-silk-project-structure)
   (side-effecting-spin-io)
   (create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
-  (create-data-driven-pages (first args))
   (store-project-dir)
   (println "Site spinning is complete, we hope you like it."))
 
@@ -32,7 +31,7 @@
 
 (defn- reload
   []
-  (future (watcher ["view/" "template/" "components/" "resource/" "data/" "meta/"]
+  (future (watcher ["view/" "template/" "components/" "resource/" "meta/"]
     (rate 500) ;; poll every 500ms
     (file-filter ignore-dotfiles) ;; add a filter for the files we care about
     (file-filter (extensions :html :css :js)) ;; filter by extensions
