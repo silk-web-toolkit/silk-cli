@@ -27,26 +27,22 @@
   (println "")
   (println (str "v" (get-version))))
 
-(defn is-dir?
-  [d]
-  (.exists (file d)))
-
 (defn side-effecting-spin-io
   []
-  (when (is-dir? "site") (do/delete-directory "site"))
+  (when (do/exists-dir? "site") (do/delete-directory "site"))
   (.mkdir (new File "site"))
   (do/copy-recursive "resource" "site")
-  (do/copy-recursive-children "meta" "site"))
+  (do/copy-file-children "meta" "site"))
 
 (defn is-silk-project?
   []
   (and
-   (is-dir? "view") (is-dir? "template") (is-dir? "resource") (is-dir? "meta")
-   (is-dir? "components")))
+   (do/exists-dir? "view") (do/exists-dir? "template") (do/exists-dir? "resource") 
+   (do/exists-dir? "meta") (do/exists-dir? "components")))
 
 (defn is-silk-configured?
   []
-  (is-dir? se/components-path))
+  (do/exists-dir? se/components-path))
         
 (defn check-silk-configuration
   []
