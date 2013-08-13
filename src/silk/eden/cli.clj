@@ -19,6 +19,7 @@
   (check-silk-project-structure)
   (side-effecting-spin-io)
   (create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
+  (create-data-driven-pages (first args))
   (store-project-dir)
   (println "Site spinning is complete, we hope you like it."))
 
