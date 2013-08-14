@@ -36,7 +36,7 @@
   (when (is-dir? "site") (do/delete-directory "site"))
   (.mkdir (new File "site"))
   (do/copy-recursive "resource" "site")
-  (do/copy-recursive-children "meta" "site"))
+  (do/copy-file-children "meta" "site"))
 
 (defn is-silk-project?
   []
