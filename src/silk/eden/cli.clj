@@ -35,7 +35,7 @@
   (future (watcher ["view/" "template/" "components/" "data/" "resource/" "meta/"]
     (rate 500) ;; poll every 500ms
     (file-filter ignore-dotfiles) ;; add a filter for the files we care about
-    (file-filter (extensions :html :css :js)) ;; filter by extensions
+    (file-filter (extensions :html :css :js :edn)) ;; filter by extensions
     (on-change #(reload-report %))))
 
   (println "Press enter to exit")
