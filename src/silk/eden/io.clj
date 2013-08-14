@@ -58,7 +58,7 @@
   []
   (if (not (is-silk-project?))
     (do
-      (throw (IllegalArgumentException. "Not a Silk project, a directory may be missing - template, view, components, data, resource or meta ?")))))
+      (throw (IllegalArgumentException. "Not a Silk project, a directory may be missing - template, view, components, resource or meta ?")))))
 
 (defn handler
   [f & handlers]
