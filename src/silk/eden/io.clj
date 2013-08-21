@@ -60,14 +60,13 @@
   []
   (when (do/exists-dir? "site") (do/delete-directory "site"))
   (.mkdir (new File "site"))
-  (do/copy-recursive "resource" "site")
-  (do/copy-file-children "meta" "site"))
+  (when (do/exists-dir? "resource") (do/copy-recursive "resource" "site"))
+  (when (do/exists-dir? "meta") (do/copy-file-children "meta" "site")))
 
 (defn is-silk-project?
   []
   (and
-   (do/exists-dir? "view") (do/exists-dir? "template") (do/exists-dir? "resource") 
-   (do/exists-dir? "meta") (do/exists-dir? "components")))
+   (do/exists-dir? "view") (do/exists-dir? "template")))
 
 (defn is-silk-configured?
   []
@@ -83,7 +82,7 @@
   []
   (if (not (is-silk-project?))
     (do
-      (throw (IllegalArgumentException. "Not a Silk project, a directory may be missing - template, view, components, data, resource or meta ?")))))
+      (throw (IllegalArgumentException. "Not a Silk project, a directory may be missing - template or view ?")))))
 
 (defn handler
   [f & handlers]
