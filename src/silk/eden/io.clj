@@ -96,7 +96,7 @@
       (println "ERROR: Sorry, either Silk is not configured properly or there is a problem with this Silk project.")
       (println (str "Cause of error: " (.getMessage iex))))
     (catch FileNotFoundException ex
-      (println "ERROR: Sorry, there was a problem, either a component is missing or this is not a silk project ?")
+      (println "ERROR: Sorry, there was a problem, either a component or datasource is missing or this is not a silk project ?")
       (println (str "Cause of error: " (.getMessage ex))))))
 
 (defn create-view-driven-pages
