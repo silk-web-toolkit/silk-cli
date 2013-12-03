@@ -68,10 +68,11 @@
   (and
    (do/exists-dir? "view") (do/exists-dir? "template")))
 
+;; last spun time and silk projects both live in silk home
 (defn is-silk-configured?
   []
-  (do/exists-dir? se/components-path))
-        
+  (do/exists-dir? se/silk-home))
+
 (defn check-silk-configuration
   []
   (if (not (is-silk-configured?))
