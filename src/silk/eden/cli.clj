@@ -1,10 +1,10 @@
 (ns silk.eden.cli
   (:require [silk.input.env :as se]
             [silk.input.file :as sf] 
-            [silk.transform.pipeline :as pipes])
-  (:use [clojure.string :only [split]]
-        [watchtower.core]
-        [silk.eden.io])
+            [silk.transform.pipeline :as pipes]
+            [watchtower.core :as watch]
+            [silk.eden.io :as io])
+  (:use [clojure.string :only [split]]        )
   (import java.io.File)
   (:gen-class))
 
@@ -15,15 +15,15 @@
 (defn- spin
   [args]
   (println "Spinning your site...")
-  (check-silk-configuration)
-  (check-silk-project-structure)
-  (side-effecting-spin-io)
-  (create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
-  (create-data-driven-pages (first args))
-  (store-project-dir)
+  (io/check-silk-configuration)
+  (io/check-silk-project-structure)
+  (io/side-effecting-spin-io)
+  (io/create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
+  (io/create-data-driven-pages (first args))
+  (io/store-project-dir)
   (println "Site spinning is complete, we hope you like it."))
 
-(def spin-handled (handler spin handle-silk-project-exception))
+(def spin-handled (io/handler spin io/handle-silk-project-exception))
 
 (defn- reload-report
   [payload]
@@ -32,11 +32,11 @@
 
 (defn- reload
   []
-  (future (watcher ["view/" "template/" "components/" "data/" "resource/" "meta/"]
-    (rate 500) ;; poll every 500ms
-    (file-filter ignore-dotfiles) ;; add a filter for the files we care about
-    (file-filter (extensions :html :css :js :edn)) ;; filter by extensions
-    (on-change #(reload-report %))))
+  (future (watch/watcher ["view/" "template/" "components/" "data/" "resource/" "meta/"]
+    (watch/rate 500) ;; poll every 500ms
+    (watch/file-filter watch/ignore-dotfiles) ;; add a filter for the files we care about
+    (watch/file-filter (watch/extensions :html :css :js :edn)) ;; filter by extensions
+    (watch/on-change #(reload-report %))))
 
   (println "Press enter to exit")
   (loop [input (read-line)]
@@ -46,21 +46,21 @@
 
 (defn sites
   []
-  (check-silk-configuration)
+  (io/check-silk-configuration)
   (println "Your Silk sites are : ")
   (with-open [rdr (clojure.java.io/reader se/spun-projects-file)]
     (doseq [line (line-seq rdr)]
-      (let [split (clojure.string/split line #",")
-            path (first split)
-            date (new java.util.Date (read-string (second split)))
+      (let [splitStr (split line #",")
+            path (first splitStr)
+            date (new java.util.Date (read-string (second splitStr)))
             date-str (.format (new java.text.SimpleDateFormat) date)]
         (println  "Last spun:" date-str path)))))
 
-(def sites-handled (handler sites handle-silk-project-exception))
+(def sites-handled (io/handler sites io/handle-silk-project-exception))
 
 (defn launch
   [args]
-  (cli-app-banner-display)
+  (io/cli-app-banner-display)
   (cond
    (= (first args) "reload") (reload)
    (= (first args) "sites")  (sites-handled)
