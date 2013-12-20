@@ -1,10 +1,11 @@
 (ns silk.eden.cli
   (:require [silk.input.env :as se]
+            [silk.input.file :as sf] 
             [silk.transform.pipeline :as pipes])
   (:use [clojure.string :only [split]]
         [watchtower.core]
         [silk.eden.io])
-  (import java.io.File java.io.FileNotFoundException)
+  (import java.io.File)
   (:gen-class))
 
 ;; =============================================================================
@@ -13,27 +14,28 @@
 
 (defn- spin
   [args]
-  (let [vdp (pipes/view-driven-pipeline-> (first args))]
-    (println "Spinning your site...")
-    (side-effecting-spin-io)
-    (doseq [t vdp]
-      (let [parent (.getParent (new File (:path t)))]
-        (when-not (nil? parent) (.mkdirs (File. "site" parent)))
-        (spit (str se/site-path (:path t)) (:content t))))
-    (println "Site spinning is complete, we hope you like it.")))
+  (println "Spinning your site...")
+  (check-silk-configuration)
+  (check-silk-project-structure)
+  (side-effecting-spin-io)
+  (create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
+  (store-project-dir)
+  (println "Site spinning is complete, we hope you like it."))
+
+(def spin-handled (handler spin handle-silk-project-exception))
 
 (defn- reload-report
   [payload]
   (println "files changed : " payload)
-  (spin ["spin"]))
+  (spin-handled ["spin"]))
 
 (defn- reload
   []
-  (def fut (future (watcher ["view/" "template/" "components/" "resource/"]
+  (future (watcher ["view/" "template/" "components/" "resource/" "meta/"]
     (rate 500) ;; poll every 500ms
     (file-filter ignore-dotfiles) ;; add a filter for the files we care about
     (file-filter (extensions :html :css :js)) ;; filter by extensions
-    (on-change #(reload-report %)))))
+    (on-change #(reload-report %))))
 
   (println "Press enter to exit")
   (loop [input (read-line)]
@@ -41,33 +43,27 @@
       (System/exit 0)
       (recur (read-line)))))
 
+(defn sites
+  []
+  (check-silk-configuration)
+  (println "Your Silk sites are : ")
+  (with-open [rdr (clojure.java.io/reader se/spun-projects-file)]
+    (doseq [line (line-seq rdr)]
+      (let [split (clojure.string/split line #",")
+            path (first split)
+            date (new java.util.Date (read-string (second split)))
+            date-str (.format (new java.text.SimpleDateFormat) date)]
+        (println  "Last spun:" date-str path)))))
+
+(def sites-handled (handler sites handle-silk-project-exception))
+
 (defn launch
   [args]
   (cli-app-banner-display)
-  (if (not (is-silk-project?))
-    (do
-      (throw (IllegalArgumentException. "Not a Silk project, one of template, view, components or resource directory are missing."))))
-  (if (= (first args) "reload")
-    (reload)
-    (spin args)))
-
-(defn handler
-  [f & handlers]
-  (reduce (fn [handled h] (partial h handled)) f (reverse handlers)))
-
-(defn handle-silk-project-exception
-  [f & args]
-  (try
-    (apply f args)
-    (catch IllegalArgumentException iex
-      (println "ERROR: Sorry, this is not a Silk project.")
-      (println (str "Cause of error: " (.getMessage iex))))
-    (catch FileNotFoundException ex
-      (println "ERROR: Sorry, there was a problem, either a component is missing or this is not a silk project ?")
-      (println (str "Cause of error: " (.getMessage ex))))))
-
-(def launch-handled (handler launch handle-silk-project-exception))
-
+  (cond
+   (= (first args) "reload") (reload)
+   (= (first args) "sites")  (sites-handled)
+   :else (spin-handled args)))
 
 ;; =============================================================================
 ;; Application entry point
@@ -75,4 +71,4 @@
 
 (defn -main
   [& args]
-  (launch-handled args))
+  (launch args))
