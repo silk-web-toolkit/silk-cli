@@ -30,12 +30,20 @@
   (println "files changed : " payload)
   (spin-handled ["spin"]))
 
+(defonce hidden-paths (str se/pwd se/fs "."))
+
+(defn- ignore-directories
+  "A file filter that removes Silk Site and hidden directories."
+  [f]
+  (not (or (.startsWith (.getCanonicalPath f) se/site-path)
+              (.startsWith (.getCanonicalPath f) hidden-paths))))
+
 (defn- reload
   []
-  (future (watch/watcher ["view/" "template/" "components/" "data/" "resource/" "meta/"]
+  (future (watch/watcher [se/pwd]
     (watch/rate 500) ;; poll every 500ms
-    (watch/file-filter watch/ignore-dotfiles) ;; add a filter for the files we care about
-    (watch/file-filter (watch/extensions :html :css :js :edn)) ;; filter by extensions
+    (watch/file-filter watch/ignore-dotfiles) ;; ignore any dotfiles
+    (watch/file-filter ignore-directories) ;; ignore file in Silk site directory
     (watch/on-change #(reload-report %))))
 
   (println "Press enter to exit")
