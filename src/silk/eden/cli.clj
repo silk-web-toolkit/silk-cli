@@ -44,7 +44,10 @@
     (watch/rate 500) ;; poll every 500ms
     (watch/file-filter watch/ignore-dotfiles) ;; ignore any dotfiles
     (watch/file-filter ignore-directories) ;; ignore file in Silk site directory
-    (watch/on-change #(reload-report %))))
+    (watch/notify-on-start? true)   ;; Determines whether notifications are made  
+    (watch/on-modify #(reload-report %))
+    (watch/on-add #(reload-report %))
+    (watch/on-delete #(reload-report %))))
 
   (println "Press enter to exit")
   (loop [input (read-line)]
