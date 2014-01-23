@@ -1,7 +1,7 @@
-(ns silk.eden.io
-  (:require [silk.input.env :as se]
-            [silk.input.file :as sf]
-            [silk.transform.pipeline :as pipes]
+(ns silk.io
+  (:require [silk.core.input.env :as se]
+            [silk.core.input.file :as sf]
+            [silk.core.transform.pipeline :as pipes]
             [clojure.java.io :refer [file]]
             [me.rossputin.diskops :as do])
   (import java.io.File java.io.FileNotFoundException))

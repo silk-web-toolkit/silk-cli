@@ -9,4 +9,4 @@
                  [silk-core "0.4.0-beta.1"]]
 
   :aot :all
-  :main silk.eden.cli)
+  :main silk.cli)

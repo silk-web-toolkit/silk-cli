@@ -1,9 +1,9 @@
-(ns silk.eden.cli
-  (:require [silk.input.env :as se]
-            [silk.input.file :as sf] 
-            [silk.transform.pipeline :as pipes]
+(ns silk.cli
+  (:require [silk.core.input.env :as se]
+            [silk.core.input.file :as sf] 
+            [silk.core.transform.pipeline :as pipes]
             [watchtower.core :as watch]
-            [silk.eden.io :as io])
+            [silk.io :as io])
   (:use [clojure.string :only [split]]        )
   (import java.io.File)
   (:gen-class))
