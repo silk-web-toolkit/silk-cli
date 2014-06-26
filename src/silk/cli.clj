@@ -1,10 +1,11 @@
 (ns silk.cli
-  (:require [silk.core.input.env :as se]
+  (:require [me.rossputin.diskops :as do]
+            [silk.core.input.env :as se]
             [silk.core.input.file :as sf] 
             [silk.core.transform.pipeline :as pipes]
             [watchtower.core :as watch]
             [silk.io :as io])
-  (:use [clojure.string :only [split]]        )
+  (:use [clojure.string :only [split]])
   (import java.io.File)
   (:gen-class))
 
@@ -30,7 +31,7 @@
   (println "files changed : " payload)
   (spin-handled ["spin"]))
 
-(defonce hidden-paths (str se/pwd se/fs "."))
+(defonce hidden-paths (str (do/pwd) (do/fs) "."))
 
 (defn- ignore-directories
   "A file filter that removes Silk Site and hidden directories."
@@ -40,7 +41,7 @@
 
 (defn- reload
   []
-  (future (watch/watcher [se/pwd]
+  (future (watch/watcher [(do/pwd)]
     (watch/rate 500) ;; poll every 500ms
     (watch/file-filter watch/ignore-dotfiles) ;; ignore any dotfiles
     (watch/file-filter ignore-directories) ;; ignore file in Silk site directory

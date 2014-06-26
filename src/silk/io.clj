@@ -27,7 +27,9 @@
   [path mode]
   (let [f (file path)
         name (.getName f)
-        tpl (file (str se/pwd se/fs "template" se/fs "detail" se/fs name ".html"))]
+        tpl (file
+              (str
+                (do/pwd) (do/fs) "template" (do/fs) "detail" (do/fs) name ".html"))]
     (when (.exists (file tpl))
       (let [details (pipes/data-detail-pipeline-> (.listFiles f) tpl mode)]
         (doseq [d details]
@@ -121,7 +123,7 @@
     (let [path (.getPath f)
           millis (.getTime (new java.util.Date))
           old (with-open [rdr (clojure.java.io/reader path)] (doall (line-seq rdr)))
-          removed (remove #(.contains % (str se/pwd ",")) old)
+          removed (remove #(.contains % (str (do/pwd) ",")) old)
           formatted (apply str (map #(str % "\n") removed))
-          updated (conj [(str se/pwd "," millis "\n")]  formatted)]
+          updated (conj [(str (do/pwd) "," millis "\n")]  formatted)]
       (spit path (apply str updated)))))
