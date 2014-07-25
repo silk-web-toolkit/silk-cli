@@ -41,8 +41,8 @@
 
 (defn- do-index-pages
   [d]
-  (println (str "processing data driven index pages"))
-  (println (str "d is : " d)))
+  ; TODO: TBD
+  )
 
 
 ;; =============================================================================
@@ -61,7 +61,7 @@
 (defn side-effecting-spin-io
   []
   (when (do/exists-dir? "site") (do/delete-directory "site"))
-  (.mkdir (new File "site"))
+  (.mkdir (File. "site"))
   (when (do/exists-dir? "resource") (do/copy-recursive "resource" "site"))
   (when (do/exists-dir? "meta") (do/copy-file-children "meta" "site")))
 

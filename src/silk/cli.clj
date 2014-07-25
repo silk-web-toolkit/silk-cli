@@ -1,7 +1,7 @@
 (ns silk.cli
   (:require [me.rossputin.diskops :as do]
             [silk.core.input.env :as se]
-            [silk.core.input.file :as sf] 
+            [silk.core.input.file :as sf]
             [silk.core.transform.pipeline :as pipes]
             [watchtower.core :as watch]
             [silk.io :as io])
@@ -19,6 +19,7 @@
   (io/check-silk-configuration)
   (io/check-silk-project-structure)
   (io/side-effecting-spin-io)
+  (pipes/microformat->)
   (io/create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
   (io/create-data-driven-pages (first args))
   (io/store-project-dir)
@@ -45,7 +46,7 @@
     (watch/rate 500) ;; poll every 500ms
     (watch/file-filter watch/ignore-dotfiles) ;; ignore any dotfiles
     (watch/file-filter ignore-directories) ;; ignore file in Silk site directory
-    (watch/notify-on-start? true)   ;; Determines whether notifications are made  
+    (watch/notify-on-start? true)   ;; Determines whether notifications are made
     (watch/on-modify #(reload-report %))
     (watch/on-add #(reload-report %))
     (watch/on-delete #(reload-report %))))
