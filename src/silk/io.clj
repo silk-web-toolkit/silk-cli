@@ -60,10 +60,13 @@
 
 (defn side-effecting-spin-io
   []
-  (when (do/exists-dir? "site") (do/delete-directory "site"))
-  (.mkdir (File. "site"))
-  (when (do/exists-dir? "resource") (do/copy-recursive "resource" "site"))
-  (when (do/exists-dir? "meta") (do/copy-file-children "meta" "site")))
+  (let [menu-dir (str "data" (do/fs) ".menu")]
+    (when (do/exists-dir? "site") (do/delete-directory "site"))
+    (when (do/exists-dir? menu-dir) (do/delete-directory menu-dir))
+    (.mkdir (File. "site"))
+    (.mkdir (File. menu-dir))
+    (when (do/exists-dir? "resource") (do/copy-recursive "resource" "site"))
+    (when (do/exists-dir? "meta") (do/copy-file-children "meta" "site"))))
 
 (defn is-silk-project?
   []
