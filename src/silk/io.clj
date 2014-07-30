@@ -60,11 +60,11 @@
 
 (defn side-effecting-spin-io
   []
-  (let [menu-dir (str "data" (do/fs) ".menu")]
+  (let [nav-dir (str "data" (do/fs) ".nav")]
     (when (do/exists-dir? "site") (do/delete-directory "site"))
-    (when (do/exists-dir? menu-dir) (do/delete-directory menu-dir))
+    (when (do/exists-dir? nav-dir) (do/delete-directory nav-dir))
     (.mkdir (File. "site"))
-    (.mkdir (File. menu-dir))
+    (.mkdir (File. nav-dir))
     (when (do/exists-dir? "resource") (do/copy-recursive "resource" "site"))
     (when (do/exists-dir? "meta") (do/copy-file-children "meta" "site"))))
 
