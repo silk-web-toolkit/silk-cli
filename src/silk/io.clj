@@ -105,6 +105,13 @@
       (println "ERROR: Sorry, there was a problem, either a component or datasource is missing or this is not a silk project ?")
       (println (str "Cause of error: " (.getMessage ex))))))
 
+(defn trace-silk-project-exception
+  [f & args]
+  (try
+    (apply f args)
+    (catch Exception iex
+      (.printStackTrace iex))))
+
 (defn create-view-driven-pages
   [vdp]
   (doseq [t vdp]
