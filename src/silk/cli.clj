@@ -19,7 +19,7 @@
   (io/check-silk-configuration)
   (io/check-silk-project-structure)
   (io/side-effecting-spin-io)
-  (pipes/microformat-> (first args))
+  (pipes/preprocessor-> (first args))
   (io/create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
   (io/create-data-driven-pages (first args))
   (io/store-project-dir)
