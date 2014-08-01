@@ -4,7 +4,7 @@
             [silk.core.transform.pipeline :as pipes]
             [clojure.java.io :refer [file]]
             [me.rossputin.diskops :as do])
-  (import java.io.File java.io.FileNotFoundException))
+  (import java.io.File))
 
 ;; =============================================================================
 ;; Helper functions
@@ -60,13 +60,12 @@
 
 (defn side-effecting-spin-io
   []
-  (let [nav-dir (str "data" (do/fs) ".nav")]
-    (when (do/exists-dir? "site") (do/delete-directory "site"))
-    (when (do/exists-dir? nav-dir) (do/delete-directory nav-dir))
-    (.mkdir (File. "site"))
-    (.mkdir (File. nav-dir))
-    (when (do/exists-dir? "resource") (do/copy-recursive "resource" "site"))
-    (when (do/exists-dir? "meta") (do/copy-file-children "meta" "site"))))
+  (when (do/exists-dir? "site") (do/delete-directory "site"))
+  (when (do/exists-dir? se/sw-path) (do/delete-directory se/sw-path))
+  (.mkdir (File. "site"))
+  (.mkdir (File. se/sw-path))
+  (when (do/exists-dir? "resource") (do/copy-recursive "resource" "site"))
+  (when (do/exists-dir? "meta") (do/copy-file-children "meta" "site")))
 
 (defn is-silk-project?
   []
@@ -101,7 +100,7 @@
     (catch IllegalArgumentException iex
       (println "ERROR: Sorry, either Silk is not configured properly or there is a problem with this Silk project.")
       (println (str "Cause of error: " (.getMessage iex))))
-    (catch FileNotFoundException ex
+    (catch Exception ex
       (println "ERROR: Sorry, there was a problem, either a component or datasource is missing or this is not a silk project ?")
       (println (str "Cause of error: " (.getMessage ex))))))
 
