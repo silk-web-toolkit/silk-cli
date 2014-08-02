@@ -6,6 +6,7 @@
                  [me.rossputin/diskops "0.2.0"]
                  [pathetic "0.4.0"]
                  [org.clojars.zcaudate/watchtower "0.1.2"]
+                 [io.aviso/pretty "0.1.12"]
                  [silk-core "0.5.0-SNAPSHOT"]]
 
   :aot :all

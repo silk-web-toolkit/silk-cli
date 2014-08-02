@@ -15,7 +15,7 @@
 
 (defn- spin
   [args]
-  (println "Spinning your site...")
+  (io/display-spin-start)
   (io/check-silk-configuration)
   (io/check-silk-project-structure)
   (io/side-effecting-spin-io)
@@ -23,14 +23,15 @@
   (io/create-view-driven-pages (pipes/view-driven-pipeline-> (first args)))
   (io/create-data-driven-pages (first args))
   (io/store-project-dir)
-  (println "Site spinning is complete, we hope you like it."))
+  (io/display-spin-end))
 
 (def spin-handled (io/handler spin io/handle-silk-project-exception))
 
 (defn- reload-report
   [payload]
-  (println "files changed : " payload)
-  (spin-handled ["spin"]))
+  (io/display-files-changed payload)
+  (spin-handled ["spin"])
+  (println "Press enter to exit"))
 
 (defonce hidden-paths (str (do/pwd) (do/fs) "."))
 
@@ -51,7 +52,6 @@
     (watch/on-add #(reload-report %))
     (watch/on-delete #(reload-report %))))
 
-  (println "Press enter to exit")
   (loop [input (read-line)]
     (when-not (= "\n" input)
       (System/exit 0)

@@ -2,7 +2,10 @@
   (:require [silk.core.input.env :as se]
             [silk.core.input.file :as sf]
             [silk.core.transform.pipeline :as pipes]
+            [silk.core.transform.path :as sp]
             [clojure.java.io :refer [file]]
+            [io.aviso.ansi :as aa]
+            [io.aviso.exception :as ae]
             [me.rossputin.diskops :as do])
   (import java.io.File))
 
@@ -51,12 +54,24 @@
 
 (defn cli-app-banner-display
   []
-  (println "    _ _ _")
-  (println " __(_) | |__")
-  (println "(_-< | | / /")
-  (println "/__/_|_|_\\_\\")
-  (println "")
-  (println (str "v" (get-version))))
+  (println      "    _ _ _")
+  (println      " __(_) | |__")
+  (println      "(_-< | | / /")
+  (println (str "/__/_|_|_\\_\\ " "v" (get-version)))
+  (println ""))
+
+(defn display-spin-start
+  []
+  (println "Spinning your site..."))
+
+(defn display-spin-end
+  []
+  (println (str (aa/bold-green "SUCCESS: ") (aa/italic "Site spinning is complete, we hope you like it."))))
+
+(defn display-files-changed
+  [files]
+  (println "Files changed in " (do/pwd))
+  (doseq [file files] (println (sp/relativise-> (do/pwd) (.getPath file)))))
 
 (defn side-effecting-spin-io
   []
@@ -98,18 +113,15 @@
   (try
     (apply f args)
     (catch IllegalArgumentException iex
-      (println "ERROR: Sorry, either Silk is not configured properly or there is a problem with this Silk project.")
-      (println (str "Cause of error: " (.getMessage iex))))
+      (println (str (aa/bold-red "ERROR: ") (aa/italic "Sorry, either Silk is not configured properly or there is a problem with this Silk project.")))
+      (println (str (aa/bold-red "CAUSE: ") (aa/italic (.getMessage iex)))))
     (catch Exception ex
-      (println "ERROR: Sorry, there was a problem, either a component or datasource is missing or this is not a silk project ?")
-      (println (str "Cause of error: " (.getMessage ex))))))
+      (println (str (aa/bold-red "ERROR: ") (aa/italic "Sorry, there was a problem, either a component or datasource is missing or this is not a Silk project ?")))
+      (println (str (aa/bold-red "CAUSE: ") (aa/italic (.getMessage ex)))))))
 
 (defn trace-silk-project-exception
   [f & args]
-  (try
-    (apply f args)
-    (catch Exception iex
-      (.printStackTrace iex))))
+  (try (apply f args) (catch Exception iex (ae/write-exception iex))))
 
 (defn create-view-driven-pages
   [vdp]
